@@ -72,7 +72,26 @@ const loginUser = async (req, res, next) => {
   });
 };
 
+const currentUser = async (req, res) => {
+  const { email } = req.user;
+
+  res.json({
+    email,
+  });
+};
+
+const logoutUser = async (req, res, next) => {
+  const { _id } = req.body;
+  if (!_id) {
+    return next(HttpError(401, "Not authorized"));
+  }
+
+  res.status(204).json();
+};
+
 export default {
   creatUser,
   loginUser,
+  currentUser,
+  logoutUser,
 };

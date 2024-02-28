@@ -7,4 +7,7 @@ authRouter.post("/signup", authController.creatUser);
 
 authRouter.post("/login", authController.loginUser);
 
+authRouter.get("/currant", authController.currentUser);
+
+authRouter.post("/logout", authController.logoutUser);
 export default authRouter;
