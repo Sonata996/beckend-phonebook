@@ -1,9 +1,12 @@
 import "dotenv/config";
+import jwt from "jsonwebtoken";
 import fs from "fs/promises";
 import path from "path";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import User from "../schemas/User.js";
+
+const { JWT_SECRET } = process.env;
 
 const creatUser = async (req, res, next) => {
   const { email, password } = req.body;
@@ -37,6 +40,39 @@ const creatUser = async (req, res, next) => {
   });
 };
 
+const loginUser = async (req, res, next) => {
+  const { email, password } = req.body;
+  const findUser = await User.findOne({ email });
+  if (!findUser) {
+    return next(HttpError(401, "Email or password is wrong"));
+  }
+
+  // if (!findUser.verify) {
+  //   return next(HttpError(401, "It's email not verify"));
+  // }
+
+  const comparePassword = await bcrypt.compare(password, findUser.password);
+  if (!comparePassword) {
+    return next(HttpError(401, "Email or password is wrong"));
+  }
+
+  const { _id: id } = findUser;
+  const payload = {
+    id,
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
+  await User.findByIdAndUpdate(findUser.id, { token });
+
+  res.json({
+    token,
+    user: {
+      email,
+    },
+  });
+};
+
 export default {
   creatUser,
+  loginUser,
 };
