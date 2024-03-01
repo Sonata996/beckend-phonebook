@@ -1,11 +1,12 @@
 import express from "express";
 import authController from "../../controllers/auth-controller.js";
+import isEmpleBody from "../../middlewares/isEmplyBody.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/signup", authController.creatUser);
+authRouter.post("/signup", isEmpleBody, authController.creatUser);
 
-authRouter.post("/login", authController.loginUser);
+authRouter.post("/login", isEmpleBody, authController.loginUser);
 
 authRouter.get("/currant", authController.currentUser);
 

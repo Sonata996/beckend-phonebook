@@ -5,6 +5,7 @@ import path from "path";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import User from "../schemas/User.js";
+import helperError from "../helpers/HttpError.js";
 
 const { JWT_SECRET } = process.env;
 
