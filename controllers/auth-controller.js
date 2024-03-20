@@ -5,14 +5,13 @@ import path from "path";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import User from "../schemas/User.js";
-import helperError from "../helpers/HttpError.js";
+import HttpError from "../helpers/HttpError.js";
 
 const { JWT_SECRET } = process.env;
 
 const creatUser = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
   const userTransfer = await User.findOne({ email });
-  console.log(req.body);
   if (userTransfer) {
     return next(HttpError(409, "Such an email is already registered"));
   }
@@ -22,20 +21,23 @@ const creatUser = async (req, res, next) => {
 
   const result = await User.create({
     ...req.body,
+    email,
+    name,
     password: hashPassword,
     verifyToken: verifyCode,
   });
 
-  //   const verifyEmail = {
-  //     to: email,
-  //     subject: "Verify email",
-  //     html: `<a target="_blank" href="${BASE_URL}/users/verify/${verifyCode}">Click to verify email</a>`,
-  //   };
-
-  //   await sendEmail(verifyEmail);
+  const { _id: id } = result;
+  const payload = {
+    id,
+  };
+  const token = jwt.sign(payload, JWT_SECRET);
+  await User.findByIdAndUpdate(id, { token, verify: true });
 
   res.status(201).json({
+    token,
     user: {
+      name: result.name,
       email: result.email,
     },
   });
@@ -48,9 +50,9 @@ const loginUser = async (req, res, next) => {
     return next(HttpError(401, "Email or password is wrong"));
   }
 
-  // if (!findUser.verify) {
-  //   return next(HttpError(401, "It's email not verify"));
-  // }
+  if (!findUser.verify) {
+    return next(HttpError(401, "It's email not verify"));
+  }
 
   const comparePassword = await bcrypt.compare(password, findUser.password);
   if (!comparePassword) {
@@ -68,6 +70,7 @@ const loginUser = async (req, res, next) => {
   res.json({
     token,
     user: {
+      name: findUser.name,
       email,
     },
   });
@@ -86,6 +89,8 @@ const logoutUser = async (req, res, next) => {
   if (!_id) {
     return next(HttpError(401, "Not authorized"));
   }
+
+  await User.findByIdAndUpdate(_id, { verify: false });
 
   res.status(204).json();
 };
