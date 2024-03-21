@@ -9,7 +9,7 @@ authRouter.post("/signup", isEmpleBody, authController.creatUser);
 
 authRouter.post("/login", isToken, isEmpleBody, authController.loginUser);
 
-authRouter.get("/currant", isToken, authController.currentUser);
+authRouter.get("/current", isToken, authController.currentUser);
 
 authRouter.post("/logout", authController.logoutUser);
 export default authRouter;

@@ -45,6 +45,7 @@ const creatUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(req.body);
   const findUser = await User.findOne({ email });
   if (!findUser) {
     return next(HttpError(401, "Email or password is wrong"));
@@ -85,12 +86,15 @@ const currentUser = async (req, res) => {
 };
 
 const logoutUser = async (req, res, next) => {
-  const { _id } = req.body;
-  if (!_id) {
+  const { email } = req.body;
+  const findUser = User.findOne({ email });
+
+  if (!findUser) {
     return next(HttpError(401, "Not authorized"));
   }
 
-  await User.findByIdAndUpdate(_id, { verify: false });
+  const { _id: id } = findUser;
+  await User.findByIdAndUpdate(id, { verify: false });
 
   res.status(204).json();
 };
