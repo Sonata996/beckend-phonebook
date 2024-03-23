@@ -1,6 +1,5 @@
-import Contact from "../schemas/User.js";
 import HttpError from "../helpers/HttpError.js";
-import User from "../schemas/User.js";
+import Contact from "../schemas/Contact.js";
 
 const getAllContacts = async (req, res, next) => {
   const resul = await Contact.find();
