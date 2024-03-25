@@ -45,7 +45,6 @@ const creatUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(req.body);
   const findUser = await User.findOne({ email });
   if (!findUser) {
     return next(HttpError(401, "Email or password is wrong"));
@@ -60,16 +59,8 @@ const loginUser = async (req, res, next) => {
     return next(HttpError(401, "Email or password is wrong"));
   }
 
-  const { _id: id } = findUser;
-  const payload = {
-    id,
-  };
-
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
-  await User.findByIdAndUpdate(findUser.id, { token });
-
   res.json({
-    token,
+    token: findUser.token,
     user: {
       name: findUser.name,
       email,

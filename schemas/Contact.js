@@ -12,6 +12,11 @@ const contactSchema = new Schema({
     required: true,
   },
   email: String,
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
 });
 
 const Contact = model("contact", contactSchema);

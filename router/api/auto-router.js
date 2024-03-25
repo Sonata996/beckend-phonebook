@@ -7,7 +7,7 @@ const authRouter = express.Router();
 
 authRouter.post("/signup", isEmpleBody, authController.creatUser);
 
-authRouter.post("/login", isToken, isEmpleBody, authController.loginUser);
+authRouter.post("/login", isEmpleBody, authController.loginUser);
 
 authRouter.get("/current", isToken, authController.currentUser);
 
